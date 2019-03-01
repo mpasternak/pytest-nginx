@@ -24,6 +24,8 @@ def init_nginx(tmpdir, template_path, host, port, server_root, php_fpm_socket=No
 
     :returns: path of the temporary nginx config
     """
+    assert not (template_path and template_str), "please specify either template_path or template_str, both were given"
+
     if template_path:
         config_template = open(template_path).read()
     elif template_str:
