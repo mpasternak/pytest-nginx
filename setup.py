@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 from setuptools import setup, find_packages
 
 requirements = [
@@ -5,7 +7,6 @@ requirements = [
 ]
 
 test_requires = [
-    'requests',
 ]
 
 setup_requires = [
@@ -16,11 +17,11 @@ setup_requires = [
 
 setup(
     name='pytest-nginx-iplweb',
-    version='1.1.0',
+    version='1.1.1',
     description='nginx fixture for pytest - iplweb temporary fork',
     long_description=(open('README.rst').read()),
     keywords='tests py.test pytest fixture nginx',
-    author='Jakub Klinkovský and Michal Pasternak',
+    author='Jakub Klinkovský and Michał Pasternak',
     author_email='michal.dtz+pytestnginx@gmail.com',
     url='https://github.com/mpasternak/pytest-nginx',
     license='GPLv3',

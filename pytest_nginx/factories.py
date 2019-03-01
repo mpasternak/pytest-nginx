@@ -18,23 +18,32 @@ def format_config(config, **kwargs):
         config = config.replace("%" + key.upper() + "%", str(value))
     return config
 
-def init_nginx(tmpdir, template_path, host, port, server_root, php_fpm_socket=None):
+def init_nginx(tmpdir, template_path, host, port, server_root, php_fpm_socket=None, template_str=None, template_extra_params=None):
     """
     Initialize data for nginx.
 
     :returns: path of the temporary nginx config
     """
+    assert not (template_path and template_str), "please specify either template_path or template_str, both were given"
+
     if template_path:
         config_template = open(template_path).read()
+    elif template_str:
+        config_template = template_str
     elif php_fpm_socket:
         config_template = NGINX_DEFAULT_PHP_CONFIG_TEMPLATE
     else:
         config_template = NGINX_DEFAULT_CONFIG_TEMPLATE
+
+    if template_extra_params is None:
+        template_extra_params = {}
+
     config = format_config(config_template,
                            tmpdir=tmpdir,
                            host=host,
                            port=port,
-                           server_root=server_root)
+                           server_root=server_root,
+                           **template_extra_params)
     if php_fpm_socket:
         config = format_config(config, php_fpm_socket=php_fpm_socket)
     config_path = os.path.join(tmpdir, "nginx.conf")
@@ -89,6 +98,11 @@ class NginxProcess:
         self.port = port
         self.server_root = server_root
 
+    def get_url(self):
+        return f"http://{self.host}:{self.port}"
+    url = property(get_url)
+
+
 def get_random_port(host=""):
     s = socket.socket()
     with contextlib.closing(s):
@@ -129,7 +143,8 @@ def get_username():
 
 
 def nginx_proc(server_root_fixture_name, host=None, port=None,
-               nginx_exec=None, nginx_params=None, config_template=None):
+               nginx_exec=None, nginx_params=None, config_template=None,
+               template_str=None, template_extra_params=None):
     """
     Nginx process factory.
 
@@ -151,7 +166,7 @@ def nginx_proc(server_root_fixture_name, host=None, port=None,
         :rtype: mirakuru.HTTPExecutor
         :returns: HTTP executor
         """
-        nonlocal host, port, nginx_exec, nginx_params, config_template
+        nonlocal host, port, nginx_exec, nginx_params, config_template, template_extra_params, template_str
 
         server_root = request.getfixturevalue(server_root_fixture_name)
 
@@ -172,7 +187,9 @@ def nginx_proc(server_root_fixture_name, host=None, port=None,
             raise ValueError("Specified config template ('{}') is not an existing file.".format(config_template))
 
         tmpdir = tmpdir_factory.mktemp("nginx-data")
-        config_path = init_nginx(tmpdir, config_template, host, port, server_root)
+        config_path = init_nginx(tmpdir, config_template, host, port, server_root,
+                                 template_str=template_str,
+                                 template_extra_params=template_extra_params)
 
         cmd = "{} -c {} {}".format(nginx_exec, config_path, nginx_params)
         with daemon(cmd,
@@ -188,7 +205,8 @@ def nginx_proc(server_root_fixture_name, host=None, port=None,
 
 def nginx_php_proc(server_root_fixture_name, host=None, port=None,
                    nginx_exec=None, nginx_params=None, nginx_config_template=None,
-                   php_fpm_exec=None, php_fpm_params=None, php_fpm_config_template=None):
+                   php_fpm_exec=None, php_fpm_params=None, php_fpm_config_template=None,
+                   template_str=None, template_extra_params=None):
     """
     Factory for the nginx and php-fpm processes.
 
@@ -210,7 +228,8 @@ def nginx_php_proc(server_root_fixture_name, host=None, port=None,
         :rtype: mirakuru.HTTPExecutor
         :returns: HTTP executor
         """
-        nonlocal host, port, nginx_exec, nginx_params, nginx_config_template, php_fpm_exec, php_fpm_params, php_fpm_config_template
+        nonlocal host, port, nginx_exec, nginx_params, nginx_config_template, php_fpm_exec, \
+            php_fpm_params, php_fpm_config_template, template_extra_params, template_str
 
         server_root = request.getfixturevalue(server_root_fixture_name)
 
@@ -237,7 +256,8 @@ def nginx_php_proc(server_root_fixture_name, host=None, port=None,
 
         tmpdir = tmpdir_factory.mktemp("nginx-php-fpm-data")
         php_fpm_config_path, php_fpm_socket_path = init_php_fpm(tmpdir, php_fpm_config_template)
-        nginx_config_path = init_nginx(tmpdir, nginx_config_template, host, port, server_root, php_fpm_socket_path)
+        nginx_config_path = init_nginx(tmpdir, nginx_config_template, host, port, server_root, php_fpm_socket_path,
+                                       template_str=template_str, template_extra_params=template_extra_params)
 
         nginx_cmd = "{} -c {} {}".format(nginx_exec, nginx_config_path, nginx_params)
         php_fpm_cmd = "{} --nodaemonize --fpm-config {} {}".format(php_fpm_exec, php_fpm_config_path, php_fpm_params)
