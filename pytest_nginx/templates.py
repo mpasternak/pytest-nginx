@@ -14,7 +14,6 @@ http {
     default_type  application/octet-stream;
     access_log off;
     sendfile on;
-    aio threads;
     charset utf-8;
 
     server {
@@ -44,7 +43,6 @@ http {
     default_type  application/octet-stream;
     access_log off;
     sendfile on;
-    aio threads;
     charset utf-8;
 
     server {
