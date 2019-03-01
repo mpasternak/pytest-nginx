@@ -5,8 +5,10 @@ python:
 install:
   - pip install -r requirements-test.txt
   - python setup.py install
-  - sudo apt-get update
-  - sudo apt-get install -y nginx-full php5-fpm
 
+  - sudo add-apt-repository -y ppa:nginx/stable
+  - sudo apt-get update
+  - sudo apt-get install -y --force-yes nginx-extras php5-fpm
+  
 script:
   - pytest
