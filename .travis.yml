@@ -15,9 +15,9 @@ install:
   
   - php-fpm -v
 
-  - phpenv versions
-  - phpenv global
-  - phpenv local
+  - sudo phpenv global 7.1.11
+  - phpenv local 7.1.11
+  
   - php-fpm -v
   
   
