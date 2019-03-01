@@ -15,7 +15,9 @@ install:
   
   - php-fpm -v
 
-  - phpenv install 7.1.23
+  - phpenv versions
+  - phpenv global
+  - phpenv local
   - php-fpm -v
   
   
