@@ -1,0 +1,26 @@
+# nginx has to start in foreground, otherwise pytest-nginx won't be able to kill it
+daemon off;
+pid %TMPDIR%/nginx.pid;
+error_log %TMPDIR%/error.log;
+worker_processes auto;
+worker_cpu_affinity auto;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    default_type  application/octet-stream;
+    access_log off;
+    sendfile on;
+    charset utf-8;
+
+    server {
+        listen       %PORT%;
+        server_name  %HOST%;
+        index  %EXTRA%.html index.html index.htm;
+        location / {
+            root "%SERVER_ROOT%";
+        }
+    }
+}
