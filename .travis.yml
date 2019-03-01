@@ -1,7 +1,9 @@
 language: python
 python:
   - "3.6"
-
+php:
+  - 7.1
+  
 install:
   - pip install -r requirements-test.txt
   - python setup.py install
