@@ -1,4 +1,6 @@
 import os
+import shutil
+
 import requests
 import pytest
 
@@ -33,6 +35,16 @@ def nginx_php_hello_world(nginx_php_proc):
     f.close()
     return nginx_php_proc
 
+
+def find_executable(n):
+    try:
+        shutil.which(n)
+        return True
+    except shutil.Error:
+        return None
+
+@pytest.mark.skipif(not find_executable("php-fpm"),
+                    reason="php-fpm not found in path")
 def test_php_hello_world(nginx_php_hello_world):
     url = "http://{}:{}".format(nginx_php_hello_world.host, nginx_php_hello_world.port)
     response = requests.get(url)
