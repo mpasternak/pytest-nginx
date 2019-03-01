@@ -1,8 +1,8 @@
 import os
 import shutil
+import urllib.request
 
 import pytest
-import requests
 
 from pytest_nginx import factories
 
@@ -25,9 +25,9 @@ def nginx_hello_world(nginx_proc):
 
 def test_hello_world(nginx_hello_world):
     url = "http://{}:{}".format(nginx_hello_world.host, nginx_hello_world.port)
-    response = requests.get(url)
-    assert response.status_code == 200
-    assert response.text == "Hello world! This is pytest-nginx."
+    response = urllib.request.urlopen(url)
+    assert response.status == 200
+    assert response.read() == b"Hello world! This is pytest-nginx."
 
     assert nginx_hello_world.url.startswith("http")
 
@@ -55,9 +55,9 @@ def find_executable(n):
                     reason="php-fpm not found in path")
 def test_php_hello_world(nginx_php_hello_world):
     url = "http://{}:{}".format(nginx_php_hello_world.host, nginx_php_hello_world.port)
-    response = requests.get(url)
-    assert response.status_code == 200
-    assert response.text == "Hello world! This is pytest-nginx, serving PHP!"
+    response = urllib.request.urlopen(url)
+    assert response.status == 200
+    assert response.read() == b"Hello world! This is pytest-nginx, serving PHP!"
 
 
 nginx_bad_config_proc = factories.nginx_proc("nginx_server_root", config_template=__file__)
@@ -87,9 +87,9 @@ def nginx_template_extra(nginx_template_extra_proc):
 
 def test_template_extra_params(nginx_template_extra):
     url = "http://{}:{}".format(nginx_template_extra.host, nginx_template_extra.port)
-    response = requests.get(url)
-    assert response.status_code == 200
-    assert response.text == "Hello world! This is pytest-nginx."
+    response = urllib.request.urlopen(url)
+    assert response.status == 200
+    assert response.read() == b"Hello world! This is pytest-nginx."
 
 
 TEST_TEMPLATE_STR = """
@@ -137,6 +137,6 @@ def nginx_templatestr(nginx_templatestr_proc):
 
 def test_templatestr(nginx_templatestr):
     url = "http://{}:{}".format(nginx_templatestr.host, nginx_templatestr.port)
-    response = requests.get(url)
-    assert response.status_code == 200
-    assert response.text == "Hello world! This is pytest-nginx."
+    response = urllib.request.urlopen(url)
+    assert response.status == 200
+    assert response.read() == b"Hello world! This is pytest-nginx."

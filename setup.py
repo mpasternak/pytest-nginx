@@ -7,7 +7,6 @@ requirements = [
 ]
 
 test_requires = [
-    'requests',
 ]
 
 setup_requires = [
