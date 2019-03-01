@@ -17,7 +17,7 @@ setup_requires = [
 
 setup(
     name='pytest-nginx-iplweb',
-    version='1.1.0',
+    version='1.1.1',
     description='nginx fixture for pytest - iplweb temporary fork',
     long_description=(open('README.rst').read()),
     keywords='tests py.test pytest fixture nginx',
