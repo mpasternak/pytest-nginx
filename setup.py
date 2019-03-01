@@ -15,14 +15,14 @@ setup_requires = [
 
 
 setup(
-    name='pytest-nginx',
+    name='pytest-nginx-iplweb',
     version='1.1',
-    description='nginx fixture for pytest',
+    description='nginx fixture for pytest - iplweb temporary fork',
     long_description=(open('README.rst').read()),
     keywords='tests py.test pytest fixture nginx',
-    author='Jakub Klinkovský',
-    author_email='lahwaacz@users.noreply.github.com',
-    url='https://github.com/lahwaacz/pytest-nginx',
+    author='Jakub Klinkovský and Michal Pasternak',
+    author_email='michal.dtz+pytestnginx@gmail.com',
+    url='https://github.com/mpasternak/pytest-nginx',
     license='GPLv3',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
