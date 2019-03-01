@@ -98,6 +98,11 @@ class NginxProcess:
         self.port = port
         self.server_root = server_root
 
+    def get_url(self):
+        return f"http://{self.host}:{self.port}"
+    url = property(get_url)
+
+
 def get_random_port(host=""):
     s = socket.socket()
     with contextlib.closing(s):

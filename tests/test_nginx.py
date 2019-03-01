@@ -29,6 +29,8 @@ def test_hello_world(nginx_hello_world):
     assert response.status_code == 200
     assert response.text == "Hello world! This is pytest-nginx."
 
+    assert nginx_hello_world.url.startswith("http")
+
 
 nginx_php_proc = factories.nginx_php_proc("nginx_server_root")
 
