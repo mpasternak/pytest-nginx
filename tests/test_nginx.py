@@ -88,3 +88,53 @@ def test_template_extra_params(nginx_template_extra):
     response = requests.get(url)
     assert response.status_code == 200
     assert response.text == "Hello world! This is pytest-nginx."
+
+
+TEST_TEMPLATE_STR = """
+# nginx has to start in foreground, otherwise pytest-nginx won't be able to kill it
+daemon off;
+pid %TMPDIR%/nginx.pid;
+error_log %TMPDIR%/error.log;
+worker_processes auto;
+worker_cpu_affinity auto;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    default_type  application/octet-stream;
+    access_log off;
+    sendfile on;
+    charset utf-8;
+
+    server {
+        listen       %PORT%;
+        server_name  %HOST%;
+        index  %EXTRA%.html index.html index.htm;
+        location / {
+            root "%SERVER_ROOT%";
+        }
+    }
+}
+"""
+
+nginx_templatestr_proc = factories.nginx_proc(
+    "nginx_server_root",
+    template_str=TEST_TEMPLATE_STR,
+    template_extra_params={"extra": "234"})
+
+
+@pytest.fixture(scope="module")
+def nginx_templatestr(nginx_templatestr_proc):
+    f = open(os.path.join(nginx_templatestr_proc.server_root, "234.html"), "w")
+    f.write("Hello world! This is pytest-nginx.")
+    f.close()
+    return nginx_templatestr_proc
+
+
+def test_templatestr(nginx_templatestr):
+    url = "http://{}:{}".format(nginx_templatestr.host, nginx_templatestr.port)
+    response = requests.get(url)
+    assert response.status_code == 200
+    assert response.text == "Hello world! This is pytest-nginx."
